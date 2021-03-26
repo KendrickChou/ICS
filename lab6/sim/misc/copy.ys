@@ -1,0 +1,50 @@
+# Name: Zhou Jiahao
+# ID: 519021911217
+
+.pos 0
+    irmovq stack, %rsp
+    call main
+
+.align 8
+# Source block
+src:
+    .quad 0x00a
+    .quad 0x0b0
+    .quad 0xc00
+
+# Destination block
+dest:
+    .quad 0x111
+    .quad 0x222
+    .quad 0x333
+
+main:
+    irmovq src,%rdi
+    irmovq dest,%rsi
+    irmovq $3 , %rdx
+    call copy_block
+    halt
+
+copy_block:
+    xorq %rax,%rax #result = 0
+    jmp test
+
+loop:
+    mrmovq (%rdi),%r9   #val = *src
+    rmmovq %r9,(%rsi)   #*dest = val
+    xorq %r9,%rax   #result ^= val
+    irmovq $8,%r9   #get 8
+    addq %r9,%rdi   #++src
+    addq %r9,%rsi   #++dest
+    irmovq $1,%r9   #get 1
+    subq %r9,%rdx
+
+test:
+    xorq %r10,%r10 #get 0
+    subq %r10,%rdx
+    jg loop
+    
+    ret
+
+    .pos 0x200
+stack:
